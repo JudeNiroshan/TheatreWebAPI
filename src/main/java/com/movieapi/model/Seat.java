@@ -22,7 +22,7 @@ public class Seat implements Serializable {
     private int seatNo;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "availability",columnDefinition = "tinyint default true")
     private boolean availability;

@@ -1,6 +1,7 @@
 package com.movieapi.controller;
 
 import com.movieapi.model.Booking;
+import com.movieapi.model.BookingRequest;
 import com.movieapi.model.Movie;
 import com.movieapi.model.Seat;
 import com.movieapi.model.Theater;
@@ -59,23 +60,21 @@ public class BookingController {
 
 	//add booking
 	@RequestMapping(value = "/createData", method = RequestMethod.POST)
-	public ResponseEntity<Booking> addUser(@RequestParam("theatreId") Long theatreId,
-			@RequestParam("movieId") Long movieId, @RequestParam("bookingDate") String bookingDate,
-			@RequestParam("numberOfSeats") Long numberOfSeats) {
+	public ResponseEntity<Booking> addUser(@RequestBody BookingRequest bookingRequest) {
 
-
+/*
 		Theater theater = theaterService.getTheaterById(theatreId);
-		Movie movie = movieService.getMovieById(movieId);
-		Seat seat = seatService.getSeatById(numberOfSeats);
+		Movie movie = movieService.getMovieById(movieId);*/
+		Seat seat = seatService.getSeatById(Long.valueOf(bookingRequest.getNumberOfSeats()));
 
 		Booking newBooking = new Booking();
-		newBooking.setTheater(theater);
-		newBooking.setMovie(movie);
+		newBooking.setTheater(bookingRequest.getTheatre());
+		newBooking.setMovie(bookingRequest.getMovie());
 		newBooking.setSeat(seat);
-		newBooking.setBookingDate(bookingDate);
+		newBooking.setBookingDate(bookingRequest.getBookingDate());
 
 		Booking persistBooking = bookingService.addBooking(newBooking);
-		return new ResponseEntity<Booking>(persistBooking, HttpStatus.CREATED);
+		return new ResponseEntity<Booking>(persistBooking, HttpStatus.OK);
 	}
 
 	//check seats availability
