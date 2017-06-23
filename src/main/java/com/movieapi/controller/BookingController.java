@@ -1,62 +1,91 @@
 package com.movieapi.controller;
 
 import com.movieapi.model.Booking;
+import com.movieapi.model.Movie;
+import com.movieapi.model.Seat;
+import com.movieapi.model.Theater;
 import com.movieapi.model.User;
 import com.movieapi.service.BookingService;
+import com.movieapi.service.MovieService;
+import com.movieapi.service.SeatService;
+import com.movieapi.service.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Created by MF Fazeel Mohamed on 6/4/2017.
  */
-@CrossOrigin(allowedHeaders="*",allowCredentials="true")
+@CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/booking")
 public class BookingController {
-    @Autowired
-    BookingService bookingService;
 
-    //get all movie info
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        List<Booking> bookingList = bookingService.getBookingList();
-        if (bookingList.isEmpty()) {
-            return new ResponseEntity<List<Booking>>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<Booking>>(bookingList, HttpStatus.OK);
-    }
+	@Autowired
+	BookingService bookingService;
 
-    //get movie by id
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Booking> getBooking(@PathVariable("id") Long id){
-        Booking booking = bookingService.getBookingById(id);
-        if(booking == null){
-            return new ResponseEntity<Booking>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<Booking>(booking,HttpStatus.OK);
-    }
+	@Autowired
+	TheaterService theaterService;
 
-    //add booking
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseEntity<Booking> addUser(@RequestBody Booking booking){
-        Booking persistBooking = bookingService.addBooking(booking);
-        return new ResponseEntity<Booking>(persistBooking,HttpStatus.CREATED);
-    }
+	@Autowired
+	MovieService movieService;
+
+	@Autowired
+	SeatService seatService;
+
+	//get all movie info
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<Booking>> getAllBookings() {
+		List<Booking> bookingList = bookingService.getBookingList();
+		if (bookingList.isEmpty()) {
+			return new ResponseEntity<List<Booking>>(HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<List<Booking>>(bookingList, HttpStatus.OK);
+	}
+
+	//get movie by id
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Booking> getBooking(@PathVariable("id") Long id) {
+		Booking booking = bookingService.getBookingById(id);
+		if (booking == null) {
+			return new ResponseEntity<Booking>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<Booking>(booking, HttpStatus.OK);
+	}
+
+	//add booking
+	@RequestMapping(value = "/createData", method = RequestMethod.POST)
+	public ResponseEntity<Booking> addUser(@RequestParam("theatreId") Long theatreId,
+			@RequestParam("movieId") Long movieId, @RequestParam("bookingDate") String bookingDate,
+			@RequestParam("numberOfSeats") Long numberOfSeats) {
 
 
-    //check seats availability
-    @RequestMapping(value = "/checkseats",method = RequestMethod.POST)
-    public ResponseEntity<String> checkSeat(@RequestBody Booking booking) {
-        List<Booking> bookingList = bookingService.getBookingList();
-        if (bookingList.isEmpty()) {
-            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<String>("", HttpStatus.OK);
-    }
+		Theater theater = theaterService.getTheaterById(theatreId);
+		Movie movie = movieService.getMovieById(movieId);
+		Seat seat = seatService.getSeatById(numberOfSeats);
 
+		Booking newBooking = new Booking();
+		newBooking.setTheater(theater);
+		newBooking.setMovie(movie);
+		newBooking.setSeat(seat);
+		newBooking.setBookingDate(bookingDate);
+
+		Booking persistBooking = bookingService.addBooking(newBooking);
+		return new ResponseEntity<Booking>(persistBooking, HttpStatus.CREATED);
+	}
+
+	//check seats availability
+	@RequestMapping(value = "/checkseats", method = RequestMethod.POST)
+	public ResponseEntity<String> checkSeat(@RequestBody Booking booking) {
+		List<Booking> bookingList = bookingService.getBookingList();
+		if (bookingList.isEmpty()) {
+			return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<String>("", HttpStatus.OK);
+	}
 
 }
