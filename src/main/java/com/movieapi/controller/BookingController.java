@@ -62,9 +62,6 @@ public class BookingController {
 	@RequestMapping(value = "/createData", method = RequestMethod.POST)
 	public ResponseEntity<Booking> addUser(@RequestBody BookingRequest bookingRequest) {
 
-/*
-		Theater theater = theaterService.getTheaterById(theatreId);
-		Movie movie = movieService.getMovieById(movieId);*/
 		Seat seat = seatService.getSeatById(Long.valueOf(bookingRequest.getNumberOfSeats()));
 
 		Booking newBooking = new Booking();
